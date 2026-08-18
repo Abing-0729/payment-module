@@ -1,8 +1,10 @@
 name: CD - Docker Images
 
 on:
-  push:
+  pull_request:
     branches: [main]
+    types: [closed]
+  push:
     tags:
       - "v*.*.*"
 
@@ -13,9 +15,14 @@ permissions:
 jobs:
   image:
     runs-on: ubuntu-latest
+    # 仅当 dev -> main 的 PR 合并后，或打 v*.*.* 标签时构建
+    if: github.event_name == 'push' || (github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref == 'dev')
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # PR 合并后检出 merge commit（main 上的最新代码）；tag 推送时检出 tag 指向的 commit
+          ref: ${{ github.event.pull_request.merge_commit_sha || github.ref }}
 
       - uses: actions/setup-go@v5
         with:
@@ -29,7 +36,6 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login to GHCR
-        if: startsWith(github.ref, 'refs/tags/')
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -46,14 +52,14 @@ jobs:
             type=ref,event=branch
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable=${{ github.event_name == 'pull_request' }}
 
       - name: Build commerce image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: services/commerce/Dockerfile
-          push: startsWith(github.ref, 'refs/tags/')
+          push: ${{ github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/') }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
