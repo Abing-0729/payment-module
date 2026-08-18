@@ -1,0 +1,11 @@
+version: v2
+plugins:
+  - local: protoc-gen-go      # 本地插件路径
+    out: api                  # 输出目录
+    opt: paths=source_relative # 选项
+  - local: protoc-gen-go-grpc # 本地插件路径
+    out: api                  # 输出目录
+    opt: paths=source_relative # 选项
+  - local: protoc-gen-go-http # 本地插件路径
+    out: api                  # 输出目录
+    opt: paths=source_relative # 选项

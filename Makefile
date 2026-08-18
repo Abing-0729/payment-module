@@ -9,8 +9,8 @@ tools: ## 安装 proto 生成工具（buf + 三个 protoc 插件）
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	@go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
 
-api: ## 从 proto 生成 Go 代码
-	cd api && buf generate
+api: ## 从 proto 生成 Go 代码（仅生成 api 模块，third_party 只参与编译）
+	buf generate api
 
 fmt-check: ## gofmt 检查（生成代码不允许手改）
 	@test -z "$$(gofmt -l $$(find . -name '*.go' -not -path './.git/*'))" || (echo "以下文件需要 gofmt 格式化:" && gofmt -l $$(find . -name '*.go' -not -path './.git/*') && exit 1)

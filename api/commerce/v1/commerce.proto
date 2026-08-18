@@ -4,6 +4,7 @@ package commerce.v1;
 
 import "google/api/annotations.proto";
 
+
 option go_package = "kratos-payment-lab/api/commerce/v1;v1";
 
 // Health 提供健康检查接口。
