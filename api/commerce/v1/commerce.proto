@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package commerce.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "kratos-payment-lab/api/commerce/v1;v1";
+
+// Health 提供健康检查接口。
+// Issue 1 为存活级（进程存活即返回 SERVING）；
+// Issue 2 接入 PostgreSQL 后升级为就绪检查（Check 内部 ping DB/Redis）。
+service HealthService {
+  // Check 返回服务名与状态。
+  rpc Check(CheckRequest) returns (CheckResponse) {
+    option (google.api.http) = {
+      get: "/healthz"
+    };
+  }
+}
+
+message CheckRequest {}
+
+message CheckResponse {
+  string service = 1;
+  // SERVING / NOT_SERVING
+  string status = 2;
+}
