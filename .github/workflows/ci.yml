@@ -31,7 +31,7 @@ jobs:
         run: make generate-check
 
       - name: Vet
-        run: go vet ./...
+        run: make vet
 
   unit:
     needs: quality
@@ -93,6 +93,8 @@ jobs:
           REDIS_ADDR: localhost:6379
 
   docker:
+    # 暂时禁用：docker-bake.hcl 与服务代码尚不存在，待 Issue 1（服务骨架）完成后恢复
+    if: false
     needs: [quality, unit]
     runs-on: ubuntu-latest
     steps:
