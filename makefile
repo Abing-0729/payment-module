@@ -1,107 +1,46 @@
-# kratos-payment-lab Makefile
-#
-# 当前处于 M0 起步阶段（尚无 proto / 服务代码 / 迁移文件）：
-# 依赖文件未就位的目标会打印提示并跳过（守卫），文件就位后执行真实命令。
-# CI 引用的目标：tools、fmt-check、generate-check、unit-test、race-test、
-# migrate-up、integration-test（.github/workflows/ci.yml）
+# Go 支付与履约系统 — 构建工具入口
+# 目标随 Issue 逐步补充：build/wire（Issue 1 服务代码）、migrate-up/sqlc（Issue 2）、verify（Issue 3）。
+# 声明伪目标
+.PHONY: tools api fmt-check generate-check wire build run-commerce run-mockpay unit-test race-test
 
-.PHONY: tools generate generate-check fmt-check vet unit-test race-test \
-        integration-test build docker-build verify migrate-up migrate-down
+# 让 make tools 安装的工具（buf/protoc 插件/wire）在子命令中可用。
+# 不依赖 PATH 是否包含 GOPATH/bin，CI 与本地行为一致。
+export PATH := $(shell go env GOPATH)/bin:$(PATH)
 
-# 工具版本暂用 @latest，后续引入 tools/tools.go 后在 go.mod 中固定。
-tools:
-	go install github.com/bufbuild/buf/cmd/buf@latest
-	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
-	go install github.com/google/wire/cmd/wire@latest
-	go install github.com/pressly/goose/v3/cmd/goose@latest
+tools: ## 安装 proto 生成工具（buf + 三个 protoc 插件）
+	@go install github.com/bufbuild/buf/cmd/buf@latest
+	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	@go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
+	@go install github.com/google/wire/cmd/wire@latest
 
-fmt-check:
-	gofmt -l . | tee /tmp/gofmt.out
-	test ! -s /tmp/gofmt.out
+api: ## 从 proto 生成 Go 代码（仅生成 api 模块，third_party 只参与编译）
+	buf generate api
 
-generate:
-	@if [ ! -f buf.yaml ]; then \
-		echo "no buf.yaml yet, skipping buf generate"; \
-	else \
-		buf generate; \
-	fi
-	@if [ ! -f db/sqlc.yaml ]; then \
-		echo "no db/sqlc.yaml yet, skipping sqlc generate"; \
-	else \
-		sqlc generate; \
-	fi
-	@if [ ! -f services/commerce/cmd/commerce/wire.go ]; then \
-		echo "no wire.go yet, skipping wire"; \
-	else \
-		wire ./services/commerce/cmd/commerce; \
-	fi
-	@if [ ! -f services/mockpay/cmd/mockpay/wire.go ]; then \
-		echo "no wire.go yet, skipping wire"; \
-	else \
-		wire ./services/mockpay/cmd/mockpay; \
-	fi
+fmt-check: ## gofmt 检查（生成代码不允许手改）
+	@test -z "$$(gofmt -l $$(find . -name '*.go' -not -path './.git/*'))" || (echo "以下文件需要 gofmt 格式化:" && gofmt -l $$(find . -name '*.go' -not -path './.git/*') && exit 1)
 
-generate-check:
-	$(MAKE) generate
-	git diff --exit-code
+generate-check: ## 检查生成代码与 proto 一致
+	@make api
+	@test -z "$$(git status --porcelain -- api)" || (echo "api 生成代码与 proto 不一致，请重新执行 make api 并提交:" && git status --porcelain -- api && exit 1)
 
-vet:
-	@if [ -z "$$(find . -name '*.go' -not -path './.git/*' 2>/dev/null)" ]; then \
-		echo "no Go files yet, skipping"; \
-	else \
-		go vet ./...; \
-	fi
+wire: ## 生成 Wire 依赖注入代码（wire_gen.go 不允许手改）
+	"$(shell go env GOPATH)/bin/wire" ./services/commerce/cmd/commerce
+	"$(shell go env GOPATH)/bin/wire" ./services/mockpay/cmd/mockpay
 
-TEST_PKGS := $(shell for d in services pkg; do [ -d $$d ] && printf "./%s/... " $$d; done)
+build: ## 同时构建两个服务到 bin/（bin/ 已在 .gitignore）
+	@mkdir -p bin
+	go build -o bin/commerce ./services/commerce/cmd/commerce
+	go build -o bin/mockpay ./services/mockpay/cmd/mockpay
 
-unit-test:
-	@if [ -n "$(TEST_PKGS)" ]; then \
-		go test $(TEST_PKGS); \
-	else \
-		echo "no services/ or pkg/ yet, skipping"; \
-	fi
+run-commerce: ## 独立启动 commerce
+	go run ./services/commerce/cmd/commerce -conf services/commerce/configs
 
-race-test:
-	@if [ -n "$(TEST_PKGS)" ]; then \
-		go test -race $(TEST_PKGS); \
-	else \
-		echo "no services/ or pkg/ yet, skipping"; \
-	fi
+run-mockpay: ## 独立启动 mockpay
+	go run ./services/mockpay/cmd/mockpay -conf services/mockpay/configs
 
-integration-test:
-	@if [ ! -d tests/integration ]; then \
-		echo "no tests/integration yet, skipping"; \
-	else \
-		go test -race -tags=integration ./tests/integration/...; \
-	fi
+unit-test: ## 单元测试
+	go test ./...
 
-build:
-	@if [ -d services/commerce/cmd/commerce ]; then \
-		go build ./services/commerce/cmd/commerce; \
-	fi
-	@if [ -d services/mockpay/cmd/mockpay ]; then \
-		go build ./services/mockpay/cmd/mockpay; \
-	fi
-
-DATABASE_URL ?= postgres://app:app@localhost:5432/commerce_test?sslmode=disable
-MIGRATIONS_DIR ?= db/migrations
-
-migrate-up:
-	@if [ -z "$$(ls $(MIGRATIONS_DIR)/*.sql 2>/dev/null)" ]; then \
-		echo "no migrations yet, skipping"; \
-	else \
-		goose -dir $(MIGRATIONS_DIR) postgres "$(DATABASE_URL)" up; \
-	fi
-
-migrate-down:
-	@if [ -z "$$(ls $(MIGRATIONS_DIR)/*.sql 2>/dev/null)" ]; then \
-		echo "no migrations yet, skipping"; \
-	else \
-		goose -dir $(MIGRATIONS_DIR) postgres "$(DATABASE_URL)" down; \
-	fi
-
-docker-build:
-	docker build -f services/commerce/Dockerfile -t commerce:ci .
-	docker build -f services/mockpay/Dockerfile -t mockpay:ci .
-
-verify: fmt-check generate-check unit-test race-test build
+race-test: ## 竞态测试
+	go test -race ./...
