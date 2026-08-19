@@ -1,10 +1,11 @@
 name: CI
 
 on:
+  # 任意分支的 PR 都触发质量检查（不再限定 main）
   pull_request:
-    branches: [main]
+  # push 到 main（PR 合并成功）后也跑一轮检查
   push:
-    branches: [dev]
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -31,7 +32,7 @@ jobs:
         run: make generate-check
 
       - name: Vet
-        run: make vet
+        run: go vet ./...
 
   unit:
     needs: quality
@@ -50,61 +51,56 @@ jobs:
       - name: Race tests
         run: make race-test
 
-  integration:
-    needs: quality
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: app
-          POSTGRES_PASSWORD: app
-          POSTGRES_DB: commerce_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U app -d commerce_test"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 20
+  # 依赖 Issue 2 的 make migrate-up 与 Issue 3 的 make integration-test，
+  # 目标尚未实现；PR 全开后会让所有 PR 变红，暂注释，Issue 2/3 恢复启用。
+  # integration:
+  #   needs: quality
+  #   runs-on: ubuntu-latest
+  #   services:
+  #     postgres:
+  #       image: postgres:16
+  #       env:
+  #         POSTGRES_USER: app
+  #         POSTGRES_PASSWORD: app
+  #         POSTGRES_DB: commerce_test
+  #       ports:
+  #         - 5432:5432
+  #       options: >-
+  #         --health-cmd "pg_isready -U app -d commerce_test"
+  #         --health-interval 5s
+  #         --health-timeout 5s
+  #         --health-retries 20
+  #     redis:
+  #       image: redis:7
+  #       ports:
+  #         - 6379:6379
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-go@v5
+  #       with:
+  #         go-version-file: go.mod
+  #         cache: true
+  #     - name: Run migrations
+  #       run: make migrate-up
+  #       env:
+  #         DATABASE_URL: postgres://app:app@localhost:5432/commerce_test?sslmode=disable
+  #     - name: Integration tests
+  #       run: make integration-test
+  #       env:
+  #         DATABASE_URL: postgres://app:app@localhost:5432/commerce_test?sslmode=disable
+  #         REDIS_ADDR: localhost:6379
 
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Run migrations
-        run: make migrate-up
-        env:
-          DATABASE_URL: postgres://app:app@localhost:5432/commerce_test?sslmode=disable
-
-      - name: Integration tests
-        run: make integration-test
-        env:
-          DATABASE_URL: postgres://app:app@localhost:5432/commerce_test?sslmode=disable
-          REDIS_ADDR: localhost:6379
-
-  docker:
-    # 暂时禁用：docker-bake.hcl 与服务代码尚不存在，待 Issue 1（服务骨架）完成后恢复
-    if: false
-    needs: [quality, unit]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build images
-        uses: docker/bake-action@v6
-        with:
-          files: docker-bake.hcl
-          targets: ci
+  # 镜像构建已由 cd-image.yml 负责（仅 push 到 main 时触发，PR 阶段不构建），
+  # 且原 job 引用的 docker-bake.hcl 尚未创建，故移除。
+  # docker:
+  #   needs: [quality, unit]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Set up Buildx
+  #       uses: docker/setup-buildx-action@v3
+  #     - name: Build images
+  #       uses: docker/bake-action@v6
+  #       with:
+  #         files: docker-bake.hcl
+  #         targets: ci

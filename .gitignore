@@ -1,0 +1,6 @@
+# IDE
+.idea/
+
+# 构建产物
+bin/
+*.exe
