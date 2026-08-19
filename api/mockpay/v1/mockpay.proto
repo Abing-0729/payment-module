@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package mockpay.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "kratos-payment-lab/api/mockpay/v1;v1";
+
+// Health 提供健康检查接口。
+// Issue 1 为存活级；Issue 7 接入渠道交易后保持存活级即可
+// （mockpay 无数据库依赖，就绪检查不适用）。
+service HealthService {
+  // Check 返回服务名与状态。
+  rpc Check(CheckRequest) returns (CheckResponse) {
+    option (google.api.http) = {
+      get: "/healthz"
+    };
+  }
+}
+
+message CheckRequest {}
+
+message CheckResponse {
+  string service = 1;
+  // SERVING / NOT_SERVING
+  string status = 2;
+}
