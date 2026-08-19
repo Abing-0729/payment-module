@@ -1,0 +1,11 @@
+# commerce 服务配置。Issue 1 仅含 HTTP/gRPC 监听;
+# Issue 2 接入 PostgreSQL/Redis 后在此追加 data 段。
+
+
+server:
+  http:
+    addr: 0.0.0.0:8000
+    timeout: 10s
+  grpc:
+    addr: 0.0.0.0:9000
+    timeout: 10s
