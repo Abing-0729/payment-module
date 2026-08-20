@@ -6,7 +6,7 @@ on:
     branches: [main]
   # push 到 main（PR 合并成功）后也跑一轮检查
   push:
-    branches: [main,develop]
+    branches: [main,dev]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
