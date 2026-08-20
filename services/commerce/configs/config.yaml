@@ -9,3 +9,9 @@ server:
   grpc:
     addr: 0.0.0.0:9000
     timeout: 10s
+
+data:
+  database:
+    dsn: postgres://payment:payment@localhost:5432/payment?sslmode=disable
+    max_conns: 10
+    connect_timeout: 5s
