@@ -1,0 +1,12 @@
+# 编辑器统一约定：文本文件一律 LF + UTF-8（与 .gitattributes 一致）
+# GoLand 会优先读取本文件，新建/保存文件时直接按此规则写，从源头避免换行符问题。
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.ps1]
+end_of_line = crlf
