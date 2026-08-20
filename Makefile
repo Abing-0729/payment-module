@@ -1,7 +1,10 @@
 # Go 支付与履约系统 — 构建工具入口
 # 目标随 Issue 逐步补充：build/wire（Issue 1 服务代码）、migrate-up/sqlc（Issue 2）、verify（Issue 3）。
 # 声明伪目标
-.PHONY: tools api fmt-check generate-check wire build run-commerce run-mockpay unit-test race-test
+POSTGRES_DSN ?= postgres://payment:payment@localhost:5432/payment?sslmode=disable
+MIGRATIONS_DIR := db/migrations
+
+.PHONY: tools api fmt-check generate-check wire build run-commerce run-mockpay unit-test race-test migrate-up migrate-down sqlc fix-eol
 
 tools: ## 安装 proto 生成工具（buf + 三个 protoc 插件）
 	@go install github.com/bufbuild/buf/cmd/buf@latest
@@ -40,3 +43,17 @@ unit-test: ## 单元测试
 
 race-test: ## 竞态测试
 	go test -race ./...
+
+migrate-up: ## 应用全部迁移（空库可重复执行）
+	goose -dir $(MIGRATIONS_DIR) postgres "$(POSTGRES_DSN)" up
+
+migrate-down: ## 回滚最近一个迁移
+	goose -dir $(MIGRATIONS_DIR) postgres "$(POSTGRES_DSN)" down
+
+sqlc: ## 生成类型安全查询代码（生成目录不许手改）
+	sqlc generate -f db/sqlc.yaml
+
+fix-eol: ## 一次性规范化所有已跟踪文本文件行尾为 LF（.gitattributes 重新生效，幂等可重复执行）
+	@git add --renormalize .
+	@git ls-files --eol | awk '$$1 ~ /^i\/crlf/ {print $$NF}' | while read -r f; do tr -d '\r' < "$$f" > "$$f.tmp" && mv "$$f.tmp" "$$f" && echo "已转换: $$f"; done
+	@echo "行尾已统一为 LF。请 git add 后提交。"
