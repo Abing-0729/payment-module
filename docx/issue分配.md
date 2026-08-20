@@ -63,11 +63,11 @@
 
 **任务**
 
-- [ ] 定义两个服务的健康检查API。
-- [ ] 为两个服务建立独立配置和端口。
-- [ ] Wire生成依赖组装代码。
-- [ ] `make build`同时构建两个服务。
-- [ ] 删除新业务对旧User/Product模块的依赖；旧模块暂不删除。
+- [x] 定义两个服务的健康检查API。
+- [X] 为两个服务建立独立配置和端口。
+- [X] Wire生成依赖组装代码。
+- [X] `make build`同时构建两个服务。
+- [X] 删除新业务对旧User/Product模块的依赖；旧模块暂不删除。
 
 **测试场景**
 
@@ -86,8 +86,8 @@ go test -race ./services/commerce/... ./services/mockpay/...
 
 **AI协作检查点**
 
-- [ ] 自己解释 `main.go -> wire -> server` 的依赖创建顺序。
-- [ ] 暂时移除一个Provider，确认Wire生成会失败，再恢复。
+- [X] 自己解释 `main.go -> wire -> server` 的依赖创建顺序。
+- [X] 暂时移除一个Provider，确认Wire生成会失败，再恢复。
 
 ---
 
