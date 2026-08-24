@@ -6,9 +6,7 @@ MIGRATIONS_DIR := db/migrations
 
 .PHONY: tools api fmt-check generate-check vet verify wire build run-commerce run-mockpay unit-test race-test integration-test migrate-up migrate-down sqlc fix-eol
 
-# 让 make tools 安装的工具（buf/protoc 插件/wire）在子命令中可用。
-# 不依赖 PATH 是否包含 GOPATH/bin，CI 与本地行为一致。
-export PATH := $(shell go env GOPATH)/bin:$(PATH)
+.PHONY: tools api fmt-check generate-check wire build run-commerce run-mockpay unit-test race-test migrate-up migrate-down sqlc fix-eol
 
 tools: ## 安装 proto 生成工具（buf + 三个 protoc 插件）
 	@go install github.com/bufbuild/buf/cmd/buf@latest
