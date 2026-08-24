@@ -3,12 +3,13 @@ name: CI
 on:
   # 任意分支的 PR 都触发质量检查（不再限定 main）
   pull_request:
+    branches: [main]
   # push 到 main（PR 合并成功）后也跑一轮检查
   push:
-    branches: [main]
+    branches: [main,develop]
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
