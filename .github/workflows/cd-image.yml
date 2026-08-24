@@ -29,6 +29,9 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Install tools
+        run: make tools
+
       - name: Run verification
         run: make verify
 
