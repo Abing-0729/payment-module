@@ -1,7 +1,10 @@
 # Go 支付与履约系统 — 构建工具入口
 # 目标随 Issue 逐步补充：build/wire（Issue 1 服务代码）、migrate-up/sqlc（Issue 2）、verify（Issue 3）。
 # 声明伪目标
-.PHONY: tools api fmt-check generate-check wire build run-commerce run-mockpay unit-test race-test
+POSTGRES_DSN ?= postgres://payment:payment@localhost:5432/payment?sslmode=disable
+MIGRATIONS_DIR := db/migrations
+
+.PHONY: tools api fmt-check generate-check vet verify wire build run-commerce run-mockpay unit-test race-test migrate-up migrate-down sqlc fix-eol
 
 # 让 make tools 安装的工具（buf/protoc 插件/wire）在子命令中可用。
 # 不依赖 PATH 是否包含 GOPATH/bin，CI 与本地行为一致。
@@ -24,6 +27,9 @@ generate-check: ## 检查生成代码与 proto 一致
 	@make api
 	@test -z "$$(git status --porcelain -- api)" || (echo "api 生成代码与 proto 不一致，请重新执行 make api 并提交:" && git status --porcelain -- api && exit 1)
 
+vet: ## go vet 静态检查
+	go vet ./...
+
 wire: ## 生成 Wire 依赖注入代码（wire_gen.go 不允许手改）
 	"$(shell go env GOPATH)/bin/wire" ./services/commerce/cmd/commerce
 	"$(shell go env GOPATH)/bin/wire" ./services/mockpay/cmd/mockpay
@@ -32,6 +38,8 @@ build: ## 同时构建两个服务到 bin/（bin/ 已在 .gitignore）
 	@mkdir -p bin
 	go build -o bin/commerce ./services/commerce/cmd/commerce
 	go build -o bin/mockpay ./services/mockpay/cmd/mockpay
+
+verify: fmt-check generate-check vet build ## CD 前置校验：格式 + 生成代码一致性 + vet + 构建
 
 run-commerce: ## 独立启动 commerce
 	go run ./services/commerce/cmd/commerce -conf services/commerce/configs
@@ -44,3 +52,17 @@ unit-test: ## 单元测试
 
 race-test: ## 竞态测试
 	go test -race ./...
+
+migrate-up: ## 应用全部迁移（空库可重复执行）
+	goose -dir $(MIGRATIONS_DIR) postgres "$(POSTGRES_DSN)" up
+
+migrate-down: ## 回滚最近一个迁移
+	goose -dir $(MIGRATIONS_DIR) postgres "$(POSTGRES_DSN)" down
+
+sqlc: ## 生成类型安全查询代码（生成目录不许手改）
+	sqlc generate -f db/sqlc.yaml
+
+fix-eol: ## 一次性规范化所有已跟踪文本文件行尾为 LF（.gitattributes 重新生效，幂等可重复执行）
+	@git add --renormalize .
+	@git ls-files --eol | awk '$$1 ~ /^i\/crlf/ {print $$NF}' | while read -r f; do tr -d '\r' < "$$f" > "$$f.tmp" && mv "$$f.tmp" "$$f" && echo "已转换: $$f"; done
+	@echo "行尾已统一为 LF。请 git add 后提交。"
