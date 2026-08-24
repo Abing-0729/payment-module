@@ -61,7 +61,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: services/commerce/Dockerfile
+          file: Dockerfile
           push: ${{ github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/') }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
