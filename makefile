@@ -4,7 +4,7 @@
 POSTGRES_DSN ?= postgres://payment:payment@localhost:5432/payment?sslmode=disable
 MIGRATIONS_DIR := db/migrations
 
-.PHONY: tools api fmt-check generate-check vet verify wire build run-commerce run-mockpay unit-test race-test migrate-up migrate-down sqlc fix-eol
+.PHONY: tools api fmt-check generate-check vet verify wire build run-commerce run-mockpay unit-test race-test integration-test migrate-up migrate-down sqlc fix-eol
 
 .PHONY: tools api fmt-check generate-check wire build run-commerce run-mockpay unit-test race-test migrate-up migrate-down sqlc fix-eol
 
@@ -50,6 +50,9 @@ unit-test: ## 单元测试
 
 race-test: ## 竞态测试
 	go test -race ./...
+
+integration-test: ## 集成测试（依赖本地 Postgres，见 deploy/docker-compose）
+	go test -tags integration ./...
 
 migrate-up: ## 应用全部迁移（空库可重复执行）
 	goose -dir $(MIGRATIONS_DIR) postgres "$(POSTGRES_DSN)" up
