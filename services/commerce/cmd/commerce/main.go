@@ -21,6 +21,7 @@ var (
 )
 
 func init() {
+	// 注册配置文件路径
 	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
 
 }
@@ -34,7 +35,12 @@ func main() {
 
 	//2.配置源
 	c := config.New(config.WithSource(file.NewSource(flagconf)))
-	defer c.Close()
+	defer func(c config.Config) {
+		err := c.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(c)
 	if err := c.Load(); err != nil {
 		panic(err)
 	}
