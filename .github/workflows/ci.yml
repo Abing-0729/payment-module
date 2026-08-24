@@ -1,12 +1,12 @@
 name: CI
 
 on:
-  # 任意分支的 PR 都触发质量检查（不再限定 main）
+  # 任意分支的 PR 到 dev/main 都触发质量检查
   pull_request:
-    branches: [main]
-  # push 到 main（PR 合并成功）后也跑一轮检查
+    branches: [dev, main]
+  # push 到 main/dev（PR 合并成功）后也跑一轮检查
   push:
-    branches: [main,develop]
+    branches: [main, dev]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
