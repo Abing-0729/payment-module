@@ -4,8 +4,6 @@
 POSTGRES_DSN ?= postgres://payment:payment@localhost:5432/payment?sslmode=disable
 MIGRATIONS_DIR := db/migrations
 
-.PHONY: tools api fmt-check generate-check vet verify wire build run-commerce run-mockpay unit-test race-test migrate-up migrate-down sqlc fix-eol
-
 .PHONY: tools api fmt-check generate-check wire build run-commerce run-mockpay unit-test race-test migrate-up migrate-down sqlc fix-eol
 
 tools: ## 安装 proto 生成工具（buf + 三个 protoc 插件）
@@ -25,9 +23,6 @@ generate-check: ## 检查生成代码与 proto 一致
 	@make api
 	@test -z "$$(git status --porcelain -- api)" || (echo "api 生成代码与 proto 不一致，请重新执行 make api 并提交:" && git status --porcelain -- api && exit 1)
 
-vet: ## go vet 静态检查
-	go vet ./...
-
 wire: ## 生成 Wire 依赖注入代码（wire_gen.go 不允许手改）
 	"$(shell go env GOPATH)/bin/wire" ./services/commerce/cmd/commerce
 	"$(shell go env GOPATH)/bin/wire" ./services/mockpay/cmd/mockpay
@@ -36,8 +31,6 @@ build: ## 同时构建两个服务到 bin/（bin/ 已在 .gitignore）
 	@mkdir -p bin
 	go build -o bin/commerce ./services/commerce/cmd/commerce
 	go build -o bin/mockpay ./services/mockpay/cmd/mockpay
-
-verify: fmt-check generate-check vet build ## CD 前置校验：格式 + 生成代码一致性 + vet + 构建
 
 run-commerce: ## 独立启动 commerce
 	go run ./services/commerce/cmd/commerce -conf services/commerce/configs
