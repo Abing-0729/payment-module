@@ -13,8 +13,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
+  verify:
     runs-on: ubuntu-latest
+    # 服务容器：凭据与本地 deploy/docker-compose/docker-compose.yml 保持一致（payment/payment/payment），
+    # 这样 Makefile 默认的 POSTGRES_DSN 在本地和 CI 都无需改动
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: payment
+          POSTGRES_PASSWORD: payment
+          POSTGRES_DB: payment
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U payment -d payment"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
     steps:
       - uses: actions/checkout@v4
 
@@ -23,85 +48,10 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      # 安装 buf / protoc 插件 / wire / sqlc / goose 到 GOPATH/bin（setup-go 已将其加入 PATH）
       - name: Install tools
         run: make tools
 
-      - name: Format check
-        run: make fmt-check
-
-      - name: Generated code check
-        run: make generate-check
-
-      - name: Vet
-        run: go vet ./...
-
-  unit:
-    needs: quality
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Unit tests
-        run: make unit-test
-
-      - name: Race tests
-        run: make race-test
-
-  # 依赖 Issue 2 的 make migrate-up 与 Issue 3 的 make integration-test，
-  # 目标尚未实现；PR 全开后会让所有 PR 变红，暂注释，Issue 2/3 恢复启用。
-  # integration:
-  #   needs: quality
-  #   runs-on: ubuntu-latest
-  #   services:
-  #     postgres:
-  #       image: postgres:16
-  #       env:
-  #         POSTGRES_USER: app
-  #         POSTGRES_PASSWORD: app
-  #         POSTGRES_DB: commerce_test
-  #       ports:
-  #         - 5432:5432
-  #       options: >-
-  #         --health-cmd "pg_isready -U app -d commerce_test"
-  #         --health-interval 5s
-  #         --health-timeout 5s
-  #         --health-retries 20
-  #     redis:
-  #       image: redis:7
-  #       ports:
-  #         - 6379:6379
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-go@v5
-  #       with:
-  #         go-version-file: go.mod
-  #         cache: true
-  #     - name: Run migrations
-  #       run: make migrate-up
-  #       env:
-  #         DATABASE_URL: postgres://app:app@localhost:5432/commerce_test?sslmode=disable
-  #     - name: Integration tests
-  #       run: make integration-test
-  #       env:
-  #         DATABASE_URL: postgres://app:app@localhost:5432/commerce_test?sslmode=disable
-  #         REDIS_ADDR: localhost:6379
-
-  # 镜像构建已由 cd-image.yml 负责（仅 push 到 main 时触发，PR 阶段不构建），
-  # 且原 job 引用的 docker-bake.hcl 尚未创建，故移除。
-  # docker:
-  #   needs: [quality, unit]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Set up Buildx
-  #       uses: docker/setup-buildx-action@v3
-  #     - name: Build images
-  #       uses: docker/bake-action@v6
-  #       with:
-  #         files: docker-bake.hcl
-  #         targets: ci
+      # 与本地验收命令完全一致：格式 + 生成一致性 + 迁移 + vet + 竞态测试 + 构建
+      - name: Verify
+        run: make verify
