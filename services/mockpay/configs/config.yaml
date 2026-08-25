@@ -2,9 +2,11 @@
 # 端口与 commerce(8000/9000)错开,便于本地同时启动两个进程。
 
 server:
+  # HTTP 服务配置。
   http:
     addr: 0.0.0.0:8001
     timeout: 10s
+  # gRPC 服务配置。
   grpc:
     addr: 0.0.0.0:9001
     timeout: 10s

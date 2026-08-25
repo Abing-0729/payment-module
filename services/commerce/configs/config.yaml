@@ -12,6 +12,9 @@ server:
 
 data:
   database:
+    # 数据库连接信息
     dsn: postgres://payment:payment@localhost:5432/payment?sslmode=disable
+    # 最大连接数
     max_conns: 10
+    # 连接超时时间
     connect_timeout: 5s
