@@ -1,0 +1,31 @@
+syntax = "proto3";
+package errors;
+option go_package="/api/commerce/v1/errors";
+
+
+enum ErrorCode{
+  SUCCESS = 0;
+  // 通用错误 1000-1999
+  INTERNAL_ERROR = 1000;
+  INVALID_ARGUMENT = 1001;
+  NOT_FOUND = 1002;
+  ALREADY_EXISTS = 1003;
+  PERMISSION_DENIED = 1004;
+  UNAUTHENTICATED = 1005;
+
+  // 订单相关 2000-2999
+  ORDER_INVALID_STATUS_TRANSITION = 2000;
+  ORDER_NOT_FOUND = 2001;
+  ORDER_CANNOT_BE_MODIFIED = 2002;
+
+  // 支付相关 3000-3999
+  PAYMENT_INVALID_STATUS_TRANSITION = 3000;
+  PAYMENT_FAILED = 3001;
+  PAYMENT_ALREADY_PROCESSED = 3002;
+}
+
+message ErrDetail{
+  ErrorCode code =1;
+  string message =2;
+  map<string,string> metadata =3;
+}
