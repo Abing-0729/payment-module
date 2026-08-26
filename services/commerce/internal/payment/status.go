@@ -12,22 +12,20 @@ const (
 	PaymentStatusFailed
 )
 
-// 状态转换表（正向允许）：Pending 发起支付，Processing 收网关结果，
-// 失败/成功均为终态，重试走新建支付单
-var allowedTransitions = map[PaymentStatus][]PaymentStatus{
-	PaymentStatusPending:    {PaymentStatusProcessing, PaymentStatusFailed},
-	PaymentStatusProcessing: {PaymentStatusSucceeded, PaymentStatusFailed},
-	// Succeeded 和 Failed 不允许再变
-}
-
+// CanTransitionPayment 判断状态转换是否合法。
+// 每个状态一个 case 显式声明允许去向；终态（成功/失败）无出边，结构上不可变。
+// Pending 发起支付，Processing 收网关结果；重试走新建支付单。
 func CanTransitionPayment(from, to PaymentStatus) bool {
-	allowed := allowedTransitions[from]
-	for _, s := range allowed {
-		if s == to {
-			return true
-		}
+	switch from {
+	case PaymentStatusPending:
+		return to == PaymentStatusProcessing || to == PaymentStatusFailed
+	case PaymentStatusProcessing:
+		return to == PaymentStatusSucceeded || to == PaymentStatusFailed
+	case PaymentStatusSucceeded, PaymentStatusFailed:
+		return false // 终态不可变
+	default:
+		return false // 未知状态
 	}
-	return false
 }
 
 func ValidatePaymentTransition(from, to PaymentStatus) error {

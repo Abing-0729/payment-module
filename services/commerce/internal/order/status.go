@@ -13,22 +13,21 @@ const (
 	OrderStatusCancelled
 )
 
-// 状态转换表（正向允许）
-var allowedTransitions = map[OrderStatus][]OrderStatus{
-	OrderStatusPending:    {OrderStatusProcessing, OrderStatusCancelled},
-	OrderStatusProcessing: {OrderStatusShipped, OrderStatusCancelled},
-	OrderStatusShipped:    {OrderStatusDelivered},
-	// 已交付和已取消不允许再变
-}
-
+// CanTransitionOrder 判断状态转换是否合法。
+// 每个状态一个 case 显式声明允许去向；终态（已交付/已取消）无出边，结构上不可变。
 func CanTransitionOrder(from, to OrderStatus) bool {
-	allowed := allowedTransitions[from]
-	for _, s := range allowed {
-		if s == to {
-			return true
-		}
+	switch from {
+	case OrderStatusPending:
+		return to == OrderStatusProcessing || to == OrderStatusCancelled
+	case OrderStatusProcessing:
+		return to == OrderStatusShipped || to == OrderStatusCancelled
+	case OrderStatusShipped:
+		return to == OrderStatusDelivered
+	case OrderStatusDelivered, OrderStatusCancelled:
+		return false // 终态不可变
+	default:
+		return false // 未知状态
 	}
-	return false
 }
 
 func ValidateOrderTransition(from, to OrderStatus) error {
