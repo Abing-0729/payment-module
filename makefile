@@ -35,6 +35,7 @@ tools: ## 安装 proto / sqlc / goose / wire 工具
 api: ## 从 proto 生成 Go 代码（仅生成 api 模块，third_party 只参与编译）
 	buf generate api
 
+
 fmt-check: ## gofmt 检查（生成代码不允许手改）
 	@test -z "$$(gofmt -l $$(find . -name '*.go' -not -path './.git/*'))" || (echo "以下文件需要 gofmt 格式化:" && gofmt -l $$(find . -name '*.go' -not -path './.git/*') && exit 1)
 
