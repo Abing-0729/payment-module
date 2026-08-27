@@ -13,3 +13,14 @@ type Account struct {
 	Balance   int64
 	CreatedAt pgtype.Timestamptz
 }
+
+type Order struct {
+	ID          int64
+	OrderNo     string
+	UserID      int64
+	AmountCents int64
+	Status      string
+	Version     int64
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+}
