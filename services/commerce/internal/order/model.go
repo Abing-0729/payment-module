@@ -12,3 +12,8 @@ type Order struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
+
+type CreateOrderInput struct {
+	UserID      int64
+	AmountCents int64
+}
