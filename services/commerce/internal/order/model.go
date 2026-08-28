@@ -2,6 +2,7 @@ package order
 
 import "time"
 
+// 定义订单结构体
 type Order struct {
 	ID          int64
 	OrderNo     string
