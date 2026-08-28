@@ -30,6 +30,17 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 // 且当前没有 proto 化配置契约的需求;Issue 2 接入数据库时扩展 Data 段。
 type Bootstrap struct {
 	Server *Server `yaml:"server"`
+	Data   *Data   `yaml:"data"`
+}
+
+type Data struct {
+	Database *Database `yaml:"database"`
+}
+
+type Database struct {
+	DSN            string   `yaml:"dsn"`
+	MaxConns       int32    `yaml:"max_conns"`
+	ConnectTimeout Duration `yaml:"connect_timeout"`
 }
 
 // Server 承载 HTTP 与 gRPC 两套监听配置。

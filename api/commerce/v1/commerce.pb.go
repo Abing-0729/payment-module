@@ -111,6 +111,282 @@ func (x *CheckResponse) GetStatus() string {
 	return ""
 }
 
+type CreateOrderRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AmountCents   int64                  `protobuf:"varint,2,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateOrderRequest) Reset() {
+	*x = CreateOrderRequest{}
+	mi := &file_commerce_v1_commerce_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateOrderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateOrderRequest) ProtoMessage() {}
+
+func (x *CreateOrderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_commerce_v1_commerce_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateOrderRequest.ProtoReflect.Descriptor instead.
+func (*CreateOrderRequest) Descriptor() ([]byte, []int) {
+	return file_commerce_v1_commerce_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *CreateOrderRequest) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *CreateOrderRequest) GetAmountCents() int64 {
+	if x != nil {
+		return x.AmountCents
+	}
+	return 0
+}
+
+type CreateOrderResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Order         *Order                 `protobuf:"bytes,1,opt,name=order,proto3" json:"order,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateOrderResponse) Reset() {
+	*x = CreateOrderResponse{}
+	mi := &file_commerce_v1_commerce_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateOrderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateOrderResponse) ProtoMessage() {}
+
+func (x *CreateOrderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_commerce_v1_commerce_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateOrderResponse.ProtoReflect.Descriptor instead.
+func (*CreateOrderResponse) Descriptor() ([]byte, []int) {
+	return file_commerce_v1_commerce_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreateOrderResponse) GetOrder() *Order {
+	if x != nil {
+		return x.Order
+	}
+	return nil
+}
+
+type GetOrderRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OrderNo       string                 `protobuf:"bytes,1,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOrderRequest) Reset() {
+	*x = GetOrderRequest{}
+	mi := &file_commerce_v1_commerce_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrderRequest) ProtoMessage() {}
+
+func (x *GetOrderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_commerce_v1_commerce_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrderRequest.ProtoReflect.Descriptor instead.
+func (*GetOrderRequest) Descriptor() ([]byte, []int) {
+	return file_commerce_v1_commerce_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetOrderRequest) GetOrderNo() string {
+	if x != nil {
+		return x.OrderNo
+	}
+	return ""
+}
+
+type GetOrderResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Order         *Order                 `protobuf:"bytes,1,opt,name=order,proto3" json:"order,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetOrderResponse) Reset() {
+	*x = GetOrderResponse{}
+	mi := &file_commerce_v1_commerce_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetOrderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetOrderResponse) ProtoMessage() {}
+
+func (x *GetOrderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_commerce_v1_commerce_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetOrderResponse.ProtoReflect.Descriptor instead.
+func (*GetOrderResponse) Descriptor() ([]byte, []int) {
+	return file_commerce_v1_commerce_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GetOrderResponse) GetOrder() *Order {
+	if x != nil {
+		return x.Order
+	}
+	return nil
+}
+
+type Order struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	OrderNo       string                 `protobuf:"bytes,1,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"`
+	UserId        int64                  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AmountCents   int64                  `protobuf:"varint,3,opt,name=amount_cents,json=amountCents,proto3" json:"amount_cents,omitempty"`
+	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	Version       int64                  `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`
+	CreatedAtUnix int64                  `protobuf:"varint,6,opt,name=created_at_unix,json=createdAtUnix,proto3" json:"created_at_unix,omitempty"`
+	UpdatedAtUnix int64                  `protobuf:"varint,7,opt,name=updated_at_unix,json=updatedAtUnix,proto3" json:"updated_at_unix,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Order) Reset() {
+	*x = Order{}
+	mi := &file_commerce_v1_commerce_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Order) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Order) ProtoMessage() {}
+
+func (x *Order) ProtoReflect() protoreflect.Message {
+	mi := &file_commerce_v1_commerce_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Order.ProtoReflect.Descriptor instead.
+func (*Order) Descriptor() ([]byte, []int) {
+	return file_commerce_v1_commerce_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *Order) GetOrderNo() string {
+	if x != nil {
+		return x.OrderNo
+	}
+	return ""
+}
+
+func (x *Order) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *Order) GetAmountCents() int64 {
+	if x != nil {
+		return x.AmountCents
+	}
+	return 0
+}
+
+func (x *Order) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *Order) GetVersion() int64 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
+}
+
+func (x *Order) GetCreatedAtUnix() int64 {
+	if x != nil {
+		return x.CreatedAtUnix
+	}
+	return 0
+}
+
+func (x *Order) GetUpdatedAtUnix() int64 {
+	if x != nil {
+		return x.UpdatedAtUnix
+	}
+	return 0
+}
+
 var File_commerce_v1_commerce_proto protoreflect.FileDescriptor
 
 const file_commerce_v1_commerce_proto_rawDesc = "" +
@@ -119,10 +395,31 @@ const file_commerce_v1_commerce_proto_rawDesc = "" +
 	"\fCheckRequest\"A\n" +
 	"\rCheckResponse\x12\x18\n" +
 	"\aservice\x18\x01 \x01(\tR\aservice\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status2a\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\"P\n" +
+	"\x12CreateOrderRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12!\n" +
+	"\famount_cents\x18\x02 \x01(\x03R\vamountCents\"?\n" +
+	"\x13CreateOrderResponse\x12(\n" +
+	"\x05order\x18\x01 \x01(\v2\x12.commerce.v1.OrderR\x05order\",\n" +
+	"\x0fGetOrderRequest\x12\x19\n" +
+	"\border_no\x18\x01 \x01(\tR\aorderNo\"<\n" +
+	"\x10GetOrderResponse\x12(\n" +
+	"\x05order\x18\x01 \x01(\v2\x12.commerce.v1.OrderR\x05order\"\xe0\x01\n" +
+	"\x05Order\x12\x19\n" +
+	"\border_no\x18\x01 \x01(\tR\aorderNo\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x03R\x06userId\x12!\n" +
+	"\famount_cents\x18\x03 \x01(\x03R\vamountCents\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x12\x18\n" +
+	"\aversion\x18\x05 \x01(\x03R\aversion\x12&\n" +
+	"\x0fcreated_at_unix\x18\x06 \x01(\x03R\rcreatedAtUnix\x12&\n" +
+	"\x0fupdated_at_unix\x18\a \x01(\x03R\rupdatedAtUnix2a\n" +
 	"\rHealthService\x12P\n" +
 	"\x05Check\x12\x19.commerce.v1.CheckRequest\x1a\x1a.commerce.v1.CheckResponse\"\x10\x82\xd3\xe4\x93\x02\n" +
-	"\x12\b/healthzB'Z%kratos-payment-lab/api/commerce/v1;v1b\x06proto3"
+	"\x12\b/healthz2\xdf\x01\n" +
+	"\fOrderService\x12g\n" +
+	"\vCreateOrder\x12\x1f.commerce.v1.CreateOrderRequest\x1a .commerce.v1.CreateOrderResponse\"\x15\x82\xd3\xe4\x93\x02\x0f:\x01*\"\n" +
+	"/v1/orders\x12f\n" +
+	"\bGetOrder\x12\x1c.commerce.v1.GetOrderRequest\x1a\x1d.commerce.v1.GetOrderResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1/orders/{order_no}B'Z%kratos-payment-lab/api/commerce/v1;v1b\x06proto3"
 
 var (
 	file_commerce_v1_commerce_proto_rawDescOnce sync.Once
@@ -136,19 +433,30 @@ func file_commerce_v1_commerce_proto_rawDescGZIP() []byte {
 	return file_commerce_v1_commerce_proto_rawDescData
 }
 
-var file_commerce_v1_commerce_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_commerce_v1_commerce_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_commerce_v1_commerce_proto_goTypes = []any{
-	(*CheckRequest)(nil),  // 0: commerce.v1.CheckRequest
-	(*CheckResponse)(nil), // 1: commerce.v1.CheckResponse
+	(*CheckRequest)(nil),        // 0: commerce.v1.CheckRequest
+	(*CheckResponse)(nil),       // 1: commerce.v1.CheckResponse
+	(*CreateOrderRequest)(nil),  // 2: commerce.v1.CreateOrderRequest
+	(*CreateOrderResponse)(nil), // 3: commerce.v1.CreateOrderResponse
+	(*GetOrderRequest)(nil),     // 4: commerce.v1.GetOrderRequest
+	(*GetOrderResponse)(nil),    // 5: commerce.v1.GetOrderResponse
+	(*Order)(nil),               // 6: commerce.v1.Order
 }
 var file_commerce_v1_commerce_proto_depIdxs = []int32{
-	0, // 0: commerce.v1.HealthService.Check:input_type -> commerce.v1.CheckRequest
-	1, // 1: commerce.v1.HealthService.Check:output_type -> commerce.v1.CheckResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	6, // 0: commerce.v1.CreateOrderResponse.order:type_name -> commerce.v1.Order
+	6, // 1: commerce.v1.GetOrderResponse.order:type_name -> commerce.v1.Order
+	0, // 2: commerce.v1.HealthService.Check:input_type -> commerce.v1.CheckRequest
+	2, // 3: commerce.v1.OrderService.CreateOrder:input_type -> commerce.v1.CreateOrderRequest
+	4, // 4: commerce.v1.OrderService.GetOrder:input_type -> commerce.v1.GetOrderRequest
+	1, // 5: commerce.v1.HealthService.Check:output_type -> commerce.v1.CheckResponse
+	3, // 6: commerce.v1.OrderService.CreateOrder:output_type -> commerce.v1.CreateOrderResponse
+	5, // 7: commerce.v1.OrderService.GetOrder:output_type -> commerce.v1.GetOrderResponse
+	5, // [5:8] is the sub-list for method output_type
+	2, // [2:5] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_commerce_v1_commerce_proto_init() }
@@ -162,9 +470,9 @@ func file_commerce_v1_commerce_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_commerce_v1_commerce_proto_rawDesc), len(file_commerce_v1_commerce_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   7,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_commerce_v1_commerce_proto_goTypes,
 		DependencyIndexes: file_commerce_v1_commerce_proto_depIdxs,

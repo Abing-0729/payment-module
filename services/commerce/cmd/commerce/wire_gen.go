@@ -9,17 +9,27 @@ package main
 import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
+	"kratos-payment-lab/services/commerce/internal/order"
 	"kratos-payment-lab/services/commerce/internal/server"
 )
 
 // Injectors from wire.go:
 
 // wireApp 组装依赖注入图:main → server(HealthService/http/grpc)→ kratos.App。
-func wireApp(conf *server.Server, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(conf *server.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
+	postgresDB, cleanup, err := server.NewPostgres(conf)
+	if err != nil {
+		return nil, func() {}, err
+	}
+	repository := order.NewRepository(postgresDB)
+	useCase := order.NewUseCase(repository, postgresDB)
+	orderService := order.NewService(useCase)
+	serverConfig := server.NewServer(conf)
 	healthService := server.NewHealthService()
-	httpServer := server.NewHTTPServer(conf, healthService, logger)
-	grpcServer := server.NewGRPCServer(conf, healthService, logger)
+	httpServer := server.NewHTTPServer(serverConfig, healthService, orderService, logger)
+	grpcServer := server.NewGRPCServer(serverConfig, healthService, orderService, logger)
 	app := newApp(logger, httpServer, grpcServer)
 	return app, func() {
+		cleanup()
 	}, nil
 }

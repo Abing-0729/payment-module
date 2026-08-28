@@ -9,11 +9,12 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/http"
 
 	v1 "kratos-payment-lab/api/commerce/v1"
+	"kratos-payment-lab/services/commerce/internal/order"
 )
 
 // NewHTTPServer 创建 HTTP 传输并注册 HealthService 路由。
 // 中间件仅保留恢复与访问日志;Issue 14 再补充 trace_id 与指标。
-func NewHTTPServer(c *Server, health *HealthService, logger log.Logger) *http.Server {
+func NewHTTPServer(c *Server, health *HealthService, orders *order.Service, logger log.Logger) *http.Server {
 	opts := []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
@@ -33,5 +34,6 @@ func NewHTTPServer(c *Server, health *HealthService, logger log.Logger) *http.Se
 	}
 	srv := http.NewServer(opts...)
 	v1.RegisterHealthServiceHTTPServer(srv, health)
+	v1.RegisterOrderServiceHTTPServer(srv, orders)
 	return srv
 }

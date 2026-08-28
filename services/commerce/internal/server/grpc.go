@@ -9,10 +9,11 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 
 	v1 "kratos-payment-lab/api/commerce/v1"
+	"kratos-payment-lab/services/commerce/internal/order"
 )
 
 // NewGRPCServer 创建 gRPC 传输并注册 HealthService。
-func NewGRPCServer(c *Server, health *HealthService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *Server, health *HealthService, orders *order.Service, logger log.Logger) *grpc.Server {
 	opts := []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
@@ -32,5 +33,6 @@ func NewGRPCServer(c *Server, health *HealthService, logger log.Logger) *grpc.Se
 	}
 	srv := grpc.NewServer(opts...)
 	v1.RegisterHealthServiceServer(srv, health)
+	v1.RegisterOrderServiceServer(srv, orders)
 	return srv
 }

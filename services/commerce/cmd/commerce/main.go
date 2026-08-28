@@ -53,7 +53,7 @@ func main() {
 
 	//4.交给wire:wireApp在wire_gen.go里由wire生成
 	// 返回kratos.APP+清理函数
-	app, cleanup, err := wireApp(bc.Server, logger)
+	app, cleanup, err := wireApp(&bc, logger)
 	if err != nil {
 		panic(err)
 	}
