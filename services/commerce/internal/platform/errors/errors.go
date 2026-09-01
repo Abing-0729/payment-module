@@ -21,6 +21,7 @@ const (
 	PaymentInvalidStatusTransition = errorpb.ErrorCode_PAYMENT_INVALID_STATUS_TRANSITION
 	PAYMENT_FAILED                 = errorpb.ErrorCode_PAYMENT_FAILED
 	PAYMENT_ALREADY_PROCESSED      = errorpb.ErrorCode_PAYMENT_ALREADY_PROCESSED
+	IDEMPOTENCY_KEY_REUSED         = errorpb.ErrorCode_ALREADY_EXISTS
 )
 
 // BusinessError 实现error接口，携带错误码信息
@@ -48,4 +49,5 @@ func Wrap(code errorpb.ErrorCode, err error) *BusinessError {
 var (
 	ErrorOrderInvaildTransaction   = New(OrderInvalidStatusTransition, "invalid order status transaction")
 	ErrorPaymentInvalidTransaction = New(PaymentInvalidStatusTransition, "invalid payment status transaction")
+	ErrorIdempotencyKeyReused      = New(IDEMPOTENCY_KEY_REUSED, "idempotency key reused with different request")
 )

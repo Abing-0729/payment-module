@@ -24,3 +24,15 @@ type Order struct {
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
 }
+
+type PaymentAttempt struct {
+	ID                 int64
+	OrderNo            string
+	AmountCents        int64
+	Channel            string
+	IdempotencyKey     string
+	RequestFingerprint string
+	Status             string
+	CreatedAt          pgtype.Timestamptz
+	UpdatedAt          pgtype.Timestamptz
+}
